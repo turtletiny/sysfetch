@@ -1,21 +1,26 @@
 use std::{env, fs, io};
 
+mod fetch;
+use fetch::*;
+
 fn main() {
-    if let Some(s) = distro() {
-        println!("{s}");
-    }
-}
+    let mut output = String::new();
 
-pub fn distro() -> Option<String> {
-    let contents = std::fs::read_to_string("/etc/os-release").ok()?;
-
-    for l in contents.lines() {
-        if let Some((key, val)) = l.split_once('=')
-            && key == "PRETTY_NAME"
-        {
-            return Some(val.trim_matches('"').to_string());
-        }
+    if let Some(distro) = distro() {
+        output.push_str(" OS: {distro}");
     }
 
-    None
+    if let Some(shell) = shell() {
+        output.push_str("Shell: {shell}");
+    }
+
+    if let Some(name) = name() {
+        output.push_str("Name: {name}")
+    }
+
+    if let Some(wm) = wm() {
+        output.push_str("WM: {wm}")
+    }
+
+    println!("{output}");
 }
